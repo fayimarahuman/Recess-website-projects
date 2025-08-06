@@ -106,16 +106,15 @@ const Home = () => {
           <h3>{product.name}</h3>
 
           <div className="product-actions">
-            <button
-              onClick={() =>
-                window.open(
-                  `https://wa.me/256753670268?text=...`,
-                  "_blank"
-                )
-              }
-            >
-              WhatsApp
-            </button>
+         <button
+  onClick={() => {
+    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${product.image}`;
+    window.open(`https://wa.me/256753670268?text=${encodeURIComponent(message)}`, "_blank");
+  }}
+>
+  WhatsApp
+</button>
+
             <button onClick={() => (window.location.href = "tel:+256753670268")}>
               Call
             </button>
