@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { FaWhatsapp, FaPhone, FaSms, FaBars, FaTimes } from "react-icons/fa";
+import { FaWhatsapp, FaPhone, FaSms, FaBars, FaTimes, FaSignInAlt } from "react-icons/fa";
 import "../styles/Navbar.css";
 
 function Navbar() {
@@ -56,6 +56,11 @@ function Navbar() {
           <a href={`tel:+${phone}`} title="Call Now" onClick={closeMenu}>
             <FaPhone className="icon-contact" />
           </a>
+        </li>
+        <li>
+          <NavLink to="/admin/login" title="Admin Login" onClick={closeMenu}>
+            <FaSignInAlt className="icon-contact" />
+          </NavLink>
         </li>
       </ul>
     </nav>

@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Home.css";
+import chandeliers from '../assets/c1.jpg';
+import PendantLights from '../assets/pendant and ceiling14.jpg';
+import WallLamps from '../assets/wall lamp1.jpg';
+import LedLight from '../assets/lighting bulb10.jpg';
+import FloorLamps from '../assets/floor lamp1.jpg';
+import Scents from '../assets/scents.jpg';
+import TableLamp from '../assets/table lamp2.jpg';
+import Spares from '../assets/parts and spares6.jpg';
 import { useNavigate } from "react-router-dom";
 
 const heroImages = [
@@ -69,31 +77,32 @@ const Home = () => {
       </div>
 
       {/* Categories Section */}
-      <section className="categories">
-        <h2>Our Product Categories</h2>
-        <div className="category-grid">
-          {[
-            "Parts & Spares",
-            "LED Light",
-            "Pendant & Ceiling",
-            "Floor Lamps",
-            "Wall Lamps",
-            "Table Lamps",
-            "Chandeliers",
-            "Fragrance Diffusers",
-            "Lighting bulbs",
-            "New Features",
-          ].map((cat, index) => (
-            <div
-              className="category-card"
-              key={index}
-              onClick={() => handleCategoryClick(cat)}
-            >
-              {cat}
-            </div>
-          ))}
+<section className="categories">
+  <h2>Our Product Categories</h2>
+  <div className="category-grid">
+    {[
+      { name: "Chandeliers", img: chandeliers },
+      { name: "Pendant & Ceiling", img: PendantLights },
+      { name: "Wall Lamps", img: WallLamps },
+      { name: "LED Light", img: LedLight },
+      { name: "Floor Lamps", img: FloorLamps },
+      { name: "Fragrance Diffusers", img: Scents },
+      { name: "Table Lamps", img: TableLamp },
+      { name: "Parts & Spares", img: Spares },
+    ].map((cat, index) => (
+      <div
+        className="category-card"
+        key={index}
+        onClick={() => handleCategoryClick(cat.name)}
+      >
+        <img src={cat.img} alt={cat.name} />
+        <div className="category-overlay">
+          <h4>{cat.name}</h4>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
 
 {/* Featured Products Section */}
 <section className="featured">
@@ -140,5 +149,6 @@ const Home = () => {
     </div>
   );
 };
+
 
 export default Home;
