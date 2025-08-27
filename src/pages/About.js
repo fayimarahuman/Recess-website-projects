@@ -3,6 +3,7 @@ import '../styles/About.css';
 import Diffusers from '../assets/diffusers.jpg';
 import Bulb from '../assets/lighting bulb10.jpg';
 import FloorLamp from '../assets/floor lamp23.jpg';
+import about from '../assets/c5.jpg';
 
 const About = () => {
   return (
@@ -101,13 +102,14 @@ const About = () => {
 };
 
 const aboutSection = {
+  backgroundImage: `url(${about})`,
   padding: '4rem 2rem',
-  backgroundColor: '#fff',
-  textAlign: 'center'
+  textAlign: 'center',
+  backgroundColor: '#f4f4f4ff',
 };
 
 const sectionTitle = { fontSize: '2rem', marginBottom: '1rem', color: '#FF7F00' };
-const sectionText = { fontSize: '1rem', color: '#333', maxWidth: '700px', margin: '0 auto' };
+const sectionText = { fontSize: '1rem', color: '#ece6e6ff', maxWidth: '700px', margin: '0 auto' };
 const gridSection = {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',

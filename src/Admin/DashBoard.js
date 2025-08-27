@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   LineChart,
   Line,
@@ -40,74 +40,126 @@ const categorySales = [
 const COLORS = ['#FF7F00', '#000000', '#FFA500'];
 
 const Dashboard = () => {
+  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
+
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <h2 style={{ color: '#FF7F00' }}>Welcome to Caroline Ways Admin Dashboard</h2>
-      <p style={{ color: '#444' }}>Manage your lighting products, customer inquiries, and business insights here.</p>
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
+      {/* Sidebar */}
+      <div
+        style={{
+          width: isSidebarVisible ? '250px' : '0',
+          backgroundColor: '#fff',
+          boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
+          transition: 'width 0.3s ease',
+          overflow: 'hidden',
+          padding: isSidebarVisible ? '1rem' : '0',
+        }}
+      >
+        <h3 style={{ color: '#FF7F00', marginBottom: '1rem' }}>Navigation</h3>
+        <ul style={{ listStyle: 'none', padding: 0 }}>
+          <li style={{ margin: '0.5rem 0' }}>
+            <a href="#products" style={{ color: '#000', textDecoration: 'none' }}>Products</a>
+          </li>
+          <li style={{ margin: '0.5rem 0' }}>
+            <a href="#customers" style={{ color: '#000', textDecoration: 'none' }}>Customers</a>
+          </li>
+          <li style={{ margin: '0.5rem 0' }}>
+            <a href="#inquiries" style={{ color: '#000', textDecoration: 'none' }}>Inquiries</a>
+          </li>
+          <li style={{ margin: '0.5rem 0' }}>
+            <a href="#testimonials" style={{ color: '#000', textDecoration: 'none' }}>Testimonials</a>
+          </li>
+        </ul>
+      </div>
 
-      <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
-        {[
-          { title: 'Total Products', value: 154 },
-          { title: 'Total Customers', value: 320 },
-          { title: 'Open Inquiries', value: 12 },
-          { title: 'Testimonials', value: 45 },
-        ].map((item, idx) => (
-          <div key={idx} style={{ flex: '1', minWidth: '200px', background: '#fff', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-            <h4 style={{ color: '#000' }}>{item.title}</h4>
-            <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#FF7F00' }}>{item.value}</p>
+      {/* Main Content */}
+      <div style={{ flex: 1, padding: '2rem' }}>
+        <button
+          onClick={toggleSidebar}
+          style={{
+            marginBottom: '1rem',
+            padding: '0.5rem 1rem',
+            backgroundColor: '#FF7F00',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+        >
+          {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
+        </button>
+
+        <h2 style={{ color: '#FF7F00' }}>Welcome to Caroline Ways Admin Dashboard</h2>
+        <p style={{ color: '#444' }}>Manage your lighting products, customer inquiries, and business insights here.</p>
+
+        <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem', flexWrap: 'wrap' }}>
+          {[
+            { title: 'Total Products', value: 154 },
+            { title: 'Total Customers', value: 320 },
+            { title: 'Open Inquiries', value: 12 },
+            { title: 'Testimonials', value: 45 },
+          ].map((item, idx) => (
+            <div key={idx} style={{ flex: '1', minWidth: '200px', background: '#fff', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+              <h4 style={{ color: '#000' }}>{item.title}</h4>
+              <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#FF7F00' }}>{item.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div>
+            <h3>Sales Overview</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={salesData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="sales" stroke="#FF7F00" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        ))}
-      </div>
 
-      <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-        <div>
-          <h3>Sales Overview</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={salesData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="sales" stroke="#FF7F00" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div>
+            <h3>Customer Sources</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie data={customerSources} dataKey="value" nameKey="name" outerRadius={80} fill="#8884d8" label>
+                  {customerSources.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div>
+            <h3>Category Sales</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={categorySales}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="sales" fill="#000" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
-        <div>
-          <h3>Customer Sources</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={customerSources} dataKey="value" nameKey="name" outerRadius={80} fill="#8884d8" label>
-                {customerSources.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+        <div style={{ marginTop: '2rem' }}>
+          <h3>Overview</h3>
+          <p style={{ maxWidth: '700px' }}>
+            This dashboard provides a quick glance at the company’s inventory, customer base, sales performance,
+            and engagement. You can manage your product listings, review testimonials, monitor inquiries, and
+            view customer trends all in one place.
+          </p>
         </div>
-
-        <div>
-          <h3>Category Sales</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={categorySales}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="sales" fill="#000" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      <div style={{ marginTop: '2rem' }}>
-        <h3>Overview</h3>
-        <p style={{ maxWidth: '700px' }}>
-          This dashboard provides a quick glance at the company’s inventory, customer base, sales performance,
-          and engagement. You can manage your product listings, review testimonials, monitor inquiries, and
-          view customer trends all in one place.
-        </p>
       </div>
     </div>
   );

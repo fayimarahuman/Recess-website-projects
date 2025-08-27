@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState } from 'react';
+import {api} from "../api/client";
 import chandelier2 from '../assets/IMG-20250725-WA0052.jpg';
 import chandelier3 from '../assets/IMG-20250725-WA0053.jpg';
 import chandelier1 from '../assets/IMG-20250725-WA0054.jpg';
@@ -84,6 +85,12 @@ const editStyle = {
 const AdminProducts = () => {
   const [products, setProducts] = useState(initialProducts);
   const [form, setForm] = useState({ id: null, name: '', description: '', image: '', sales: 0, stock: 0 });
+
+  useEffect(() => {
+    api.get("/products")
+      .then((res) => setProducts(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleDelete = (id) => {
     setProducts(products.filter(product => product.id !== id));

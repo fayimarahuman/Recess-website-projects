@@ -15,6 +15,7 @@ function Login({ onLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     try {
       const res = await axios.post(
         "http://127.0.0.1:5000/auth/admin/login",
@@ -30,7 +31,7 @@ function Login({ onLogin }) {
         return;
       }
 
-      localStorage.setItem('token', token);
+      localStorage.setItem('adminToken', token);
       localStorage.setItem('user', JSON.stringify(admin));
 
       if (onLogin) onLogin(admin);
@@ -46,7 +47,7 @@ function Login({ onLogin }) {
         <h2>Admin Dashboard Login</h2>
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email Address</label>
+            <label htmlFor="email">Email</label>
             <input id="email" name="email" type="email" value={form.email}
               onChange={handleChange} required />
           </div>
