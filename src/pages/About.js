@@ -1,5 +1,9 @@
 import React from 'react';
 import '../styles/About.css';
+import Diffusers from '../assets/diffusers.jpg';
+import Bulb from '../assets/lighting bulb10.jpg';
+import FloorLamp from '../assets/floor lamp23.jpg';
+import about from '../assets/c5.jpg';
 
 const About = () => {
   return (
@@ -12,6 +16,32 @@ const About = () => {
           that empower homes, businesses, and contractors across Uganda.
         </p>
       </section>
+
+      <section style={aboutSection}>
+        <h2 style={sectionTitle}>Why Choose Us?</h2>
+        <p style={sectionText}>
+          At Caroline Ways, we bring you premium lighting solutions tailored to modern living spaces. From stunning chandeliers to elegant wall lights, our collections combine style, functionality, and energy efficiency.
+        </p>
+      </section>
+
+      <section style={gridSection}>
+        <div style={gridItem}>
+          <img src={FloorLamp} alt="Modern Design" style={gridImage} />
+          <h3 style={gridTitle}>Modern Designs</h3>
+          <p style={gridText}>Sophisticated lighting styles crafted for contemporary interiors.</p>
+        </div>
+        <div style={gridItem}>
+          <img src={Bulb} alt="Eco Friendly" style={gridImage} />
+          <h3 style={gridTitle}>Eco-Friendly</h3>
+          <p style={gridText}>Energy-saving bulbs and sustainable materials used in every piece.</p>
+        </div>
+        <div style={gridItem}>
+          <img src={Diffusers} alt="Excellent Scents" style={gridImage} />
+          <h3 style={gridTitle}>Excellent Scents</h3>
+          <p style={gridText}>Transform your space with our premium fragrance diffusers.</p>
+        </div>
+      </section>
+
 
       <section className="about-content">
         <h2>Our Story</h2>
@@ -71,4 +101,32 @@ const About = () => {
   );
 };
 
+const aboutSection = {
+  backgroundImage: `url(${about})`,
+  padding: '4rem 2rem',
+  textAlign: 'center',
+  backgroundColor: '#f4f4f4ff',
+};
+
+const sectionTitle = { fontSize: '2rem', marginBottom: '1rem', color: '#FF7F00' };
+const sectionText = { fontSize: '1rem', color: '#ece6e6ff', maxWidth: '700px', margin: '0 auto' };
+const gridSection = {
+  display: 'grid',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(270px, 1fr))',
+  gap: '2rem',
+  padding: '3rem 2rem',
+  backgroundColor: '#f6f6f6'
+};
+
+const gridItem = {
+  backgroundColor: '#fff',
+  borderRadius: '20px',
+  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+  textAlign: 'center',
+  padding: '1.5rem'
+};
+
+const gridImage = { width: '100%', height: '180px', objectFit: 'cover', borderRadius: '5px' };
+const gridTitle = { color: '#FF7F00', marginTop: '1rem' };
+const gridText = { color: '#333', fontSize: '0.95rem' };
 export default About;
