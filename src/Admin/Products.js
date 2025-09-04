@@ -1,45 +1,9 @@
-import React, {useEffect, useState } from 'react';
-import {api} from "../api/client";
+import React, { useEffect, useState } from "react";
+import { api } from "../api/client";
+import chandelier1 from '../assets/IMG-20250725-WA0054.jpg';
 import chandelier2 from '../assets/IMG-20250725-WA0052.jpg';
 import chandelier3 from '../assets/IMG-20250725-WA0053.jpg';
-import chandelier1 from '../assets/IMG-20250725-WA0054.jpg';
 import chandelier4 from '../assets/IMG-20250725-WA0055.jpg';
-
-const initialProducts = [
-  {
-    id: 1,
-    name: 'Modern Chandelier',
-    description: 'An elegant chandelier perfect for large living rooms.',
-    image: chandelier1,
-    sales: 34,
-    stock: 12
-  },
-  {
-    id: 2,
-    name: 'Minimalist Pendant Light',
-    description: 'A sleek hanging pendant light ideal for kitchens.',
-    image: chandelier2,
-    sales: 21,
-    stock: 8
-  },
-  {
-    id: 3,
-    name: 'Classic Wall Sconce',
-    description: 'A timeless wall sconce that adds warmth to any room.',
-    image: chandelier3,
-    sales: 15,
-    stock: 5
-  },
-  {
-    id: 4,
-    name: 'Elegant Crystal Chandelier',
-    description: 'A stunning crystal chandelier for a touch of luxury.',
-    image: chandelier4,
-    sales: 10,
-    stock: 2
-  }
-];
-
 
 const inputStyle = {
   display: 'block',
@@ -82,37 +46,98 @@ const editStyle = {
   cursor: 'pointer'
 };
 
-const AdminProducts = () => {
-  const [products, setProducts] = useState(initialProducts);
-  const [form, setForm] = useState({ id: null, name: '', description: '', image: '', sales: 0, stock: 0 });
+const defaultImages = [chandelier1, chandelier2, chandelier3, chandelier4];
 
+const AdminProducts = () => {
+  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState({
+    id: null,
+    name: "",
+    description: "",
+    image: "",
+    sales: 0,
+    stock: 0,
+  });
+
+  // Fetch products from backend
   useEffect(() => {
-    api.get("/products")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error(err));
+    fetchProducts();
   }, []);
 
-  const handleDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
+  const fetchProducts = async () => {
+    try {
+      const res = await api.get("/products");
+      setProducts(res.data || []);
+    } catch (err) {
+      console.error("Error fetching products", err);
+      // Fallback to default images if backend fails
+      setProducts([
+        {
+          id: 1,
+          name: 'Modern Chandelier',
+          description: 'An elegant chandelier perfect for large living rooms.',
+          image: chandelier1,
+          sales: 34,
+          stock: 12
+        },
+        {
+          id: 2,
+          name: 'Minimalist Pendant Light',
+          description: 'A sleek hanging pendant light ideal for kitchens.',
+          image: chandelier2,
+          sales: 21,
+          stock: 8
+        },
+        {
+          id: 3,
+          name: 'Classic Wall Sconce',
+          description: 'A timeless wall sconce that adds warmth to any room.',
+          image: chandelier3,
+          sales: 15,
+          stock: 5
+        },
+        {
+          id: 4,
+          name: 'Elegant Crystal Chandelier',
+          description: 'A stunning crystal chandelier for a touch of luxury.',
+          image: chandelier4,
+          sales: 10,
+          stock: 2
+        }
+      ]);
+    }
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (form.id) {
+        await api.put(`/products/${form.id}`, form);
+      } else {
+        await api.post("/products", form);
+      }
+      setForm({ id: null, name: "", description: "", image: "", sales: 0, stock: 0 });
+      fetchProducts();
+    } catch (err) {
+      console.error("Error saving product", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/products/${id}`);
+      fetchProducts();
+    } catch (err) {
+      console.error("Error deleting product", err);
+    }
   };
 
   const handleEdit = (product) => {
     setForm(product);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (form.id) {
-      setProducts(products.map(p => (p.id === form.id ? form : p)));
-    } else {
-      setProducts([...products, { ...form, id: Date.now() }]);
-    }
-    setForm({ id: null, name: '', description: '', image: '', sales: 0, stock: 0 });
   };
 
   return (
@@ -132,7 +157,7 @@ const AdminProducts = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
         {products.map(product => (
           <div key={product.id} style={{ backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', transition: 'transform 0.2s ease-in-out' }}>
-            <img src={product.image} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+            <img src={product.image || defaultImages[product.id % defaultImages.length]} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
             <div style={{ padding: '1.25rem' }}>
               <h3 style={{ marginBottom: '0.5rem', color: '#000' }}>{product.name}</h3>
               <p style={{ color: '#666', fontSize: '0.95rem' }}>{product.description}</p>

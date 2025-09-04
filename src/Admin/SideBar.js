@@ -3,9 +3,7 @@ import { NavLink } from 'react-router-dom';
 import {
   FiHome,
   FiPackage,
-  FiUsers,
   FiGrid,
-  FiMail,
   FiMessageSquare,
 } from 'react-icons/fi';
 import logo from '../assets/logo.png'; 
@@ -14,9 +12,8 @@ const Sidebar = () => {
   const menuItems = [
     { path: '/admin', label: 'Dashboard', icon: <FiHome /> },
     { path: '/admin/products', label: 'Products', icon: <FiPackage /> },
-    { path: '/admin/customers', label: 'Customers', icon: <FiUsers /> },
     { path: '/admin/categories', label: 'Categories', icon: <FiGrid /> },
-    { path: '/admin/inquiries', label: 'Inquiries', icon: <FiMail /> },
+    { path: '/admin/inquiries', label: 'Inquiries', icon: <FiMessageSquare /> },
     { path: '/admin/testimonials', label: 'Testimonials', icon: <FiMessageSquare /> },
   ];
 

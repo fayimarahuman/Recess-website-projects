@@ -48,33 +48,6 @@ const Dashboard = () => {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f9f9f9' }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: isSidebarVisible ? '250px' : '0',
-          backgroundColor: '#fff',
-          boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
-          transition: 'width 0.3s ease',
-          overflow: 'hidden',
-          padding: isSidebarVisible ? '1rem' : '0',
-        }}
-      >
-        <h3 style={{ color: '#FF7F00', marginBottom: '1rem' }}>Navigation</h3>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          <li style={{ margin: '0.5rem 0' }}>
-            <a href="#products" style={{ color: '#000', textDecoration: 'none' }}>Products</a>
-          </li>
-          <li style={{ margin: '0.5rem 0' }}>
-            <a href="#customers" style={{ color: '#000', textDecoration: 'none' }}>Customers</a>
-          </li>
-          <li style={{ margin: '0.5rem 0' }}>
-            <a href="#inquiries" style={{ color: '#000', textDecoration: 'none' }}>Inquiries</a>
-          </li>
-          <li style={{ margin: '0.5rem 0' }}>
-            <a href="#testimonials" style={{ color: '#000', textDecoration: 'none' }}>Testimonials</a>
-          </li>
-        </ul>
-      </div>
 
       {/* Main Content */}
       <div style={{ flex: 1, padding: '2rem' }}>
@@ -90,7 +63,6 @@ const Dashboard = () => {
             cursor: 'pointer',
           }}
         >
-          {isSidebarVisible ? 'Hide Sidebar' : 'Show Sidebar'}
         </button>
 
         <h2 style={{ color: '#FF7F00' }}>Welcome to Caroline Ways Admin Dashboard</h2>

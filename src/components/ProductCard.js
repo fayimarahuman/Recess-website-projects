@@ -1,4 +1,5 @@
 import React from "react";
+import { FiPhone } from "react-icons/fi"; // phone call icon
 import "../styles/ProductCard.css";
 
 const ProductCard = ({ product }) => {
@@ -25,7 +26,7 @@ const ProductCard = ({ product }) => {
           WhatsApp
         </button>
         <button className="btn contact-btn" onClick={handleCall}>
-          Call
+          <FiPhone size={18} /> {/* Phone icon */}
         </button>
       </div>
     </div>

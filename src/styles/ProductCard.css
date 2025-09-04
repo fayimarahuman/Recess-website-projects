@@ -49,7 +49,7 @@
 }
 
 .btn.contact-btn {
-  background-color: orange;
+  background-color: rgb(255, 157, 0);
   color: white;
   border: none;
   padding: 8px 14px;
@@ -60,9 +60,9 @@
 }
 
 .btn.contact-btn:hover {
-  background-color: #e67e00;
+  background-color: #fcfaf8;
   color: #222;
-  box-shadow: 0 0 6px #f8a64c;
+  box-shadow: 0 0 6px #f6f4f2;
 }
 
 .products-grid {

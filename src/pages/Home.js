@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import "../styles/Home.css";
+import { FiPhone } from "react-icons/fi";
+
 import chandeliers from '../assets/c1.jpg';
 import PendantLights from '../assets/pendant and ceiling14.jpg';
 import WallLamps from '../assets/wall lamp1.jpg';
 import LedLight from '../assets/lighting bulb10.jpg';
-import FloorLamps from '../assets/floor lamp1.jpg';
+import FloorLamp from '../assets/floor lamp23.jpg';
 import Scents from '../assets/scents.jpg';
 import TableLamp from '../assets/table lamp2.jpg';
 import Spares from '../assets/parts and spares6.jpg';
@@ -85,7 +87,7 @@ const Home = () => {
       { name: "Pendant & Ceiling", img: PendantLights },
       { name: "Wall Lamps", img: WallLamps },
       { name: "LED Light", img: LedLight },
-      { name: "Floor Lamps", img: FloorLamps },
+      { name: "Floor Lamps", img: FloorLamp },
       { name: "Fragrance Diffusers", img: Scents },
       { name: "Table Lamps", img: TableLamp },
       { name: "Parts & Spares", img: Spares },
@@ -125,8 +127,9 @@ const Home = () => {
 </button>
 
             <button onClick={() => (window.location.href = "tel:+256753670268")}>
-              Call
+              <FiPhone size={18} />
             </button>
+
           </div>
         </div>
       ))

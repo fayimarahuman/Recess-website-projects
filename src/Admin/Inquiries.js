@@ -97,5 +97,3 @@ const buttonStyle = (bgColor) => ({
 });
 
 export default Inquiries;
-
-

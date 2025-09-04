@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import AdminLayout from '../layouts/AdminLayout';
 import PrivateRoute from './PrivateRoute';
 
-import Dashboard from '../pages/Dashboard';
+import Dashboard from '../pages/DashBoard';
 import Products from '../pages/Products';
 import Customers from '../pages/Customers';
 import Categories from '../pages/Categories';
