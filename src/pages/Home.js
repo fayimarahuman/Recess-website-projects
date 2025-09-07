@@ -79,65 +79,66 @@ const Home = () => {
       </div>
 
       {/* Categories Section */}
-<section className="categories">
-  <h2>Our Product Categories</h2>
-  <div className="category-grid">
-    {[
-      { name: "Chandeliers", img: chandeliers },
-      { name: "Pendant & Ceiling", img: PendantLights },
-      { name: "Wall Lamps", img: WallLamps },
-      { name: "LED Light", img: LedLight },
-      { name: "Floor Lamps", img: FloorLamp },
-      { name: "Fragrance Diffusers", img: Scents },
-      { name: "Table Lamps", img: TableLamp },
-      { name: "Parts & Spares", img: Spares },
-    ].map((cat, index) => (
-      <div
-        className="category-card"
-        key={index}
-        onClick={() => handleCategoryClick(cat.name)}
-      >
-        <img src={cat.img} alt={cat.name} />
-        <div className="category-overlay">
-          <h4>{cat.name}</h4>
+      <section className="categories">
+        <h2>Our Product Categories</h2>
+        <div className="category-grid">
+          {[
+            { name: "Chandeliers", img: chandeliers },
+            { name: "Pendant & Ceiling", img: PendantLights },
+            { name: "Wall Lamps", img: WallLamps },
+            { name: "LED Light", img: LedLight },
+            { name: "Floor Lamps", img: FloorLamp },
+            { name: "Fragrance Diffusers", img: Scents },
+            { name: "Table Lamps", img: TableLamp },
+            { name: "Parts & Spares", img: Spares },
+          ].map((cat, index) => (
+            <div
+              className="category-card"
+              key={index}
+              onClick={() => handleCategoryClick(cat.name)}
+            >
+              <img src={cat.img} alt={cat.name} />
+              <div className="category-overlay">
+                <h4>{cat.name}</h4>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    ))}
-  </div>
-</section>
+      </section>
 
-{/* Featured Products Section */}
-<section className="featured">
-  <h2>Featured Products</h2>
-  <div className="product-grid">
-    {products.length > 0 ? (
-      products.slice(0, 6).map((product) => (
-        <div className="product-card" key={product.id}>
-          <img src={product.image} alt={product.name} />
-          <h3>{product.name}</h3>
+      {/* Featured Products Section */}
+      <section className="featured">
+        <h2>Featured Products</h2>
+        <div className="product-grid">
+          {products.length > 0 ? (
+            products.slice(0, 6).map((product) => (
+              <div className="product-card" key={product.id}>
+                <img src={product.image} alt={product.name} />
+                <h3>{product.name}</h3>
 
-          <div className="product-actions">
-         <button
-  onClick={() => {
-    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${product.image}`;
-    window.open(`https://wa.me/256753670268?text=${encodeURIComponent(message)}`, "_blank");
-  }}
->
-  WhatsApp
-</button>
+                <div className="product-actions">
+                  <button
+                    onClick={() => {
+                      const domain = "https://carolineways.com"; // your hosted domain
+                      const imageUrl = `${domain}${product.image}`;
+                      const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${imageUrl}`;
+                      window.open(`https://wa.me/256753670268?text=${encodeURIComponent(message)}`, "_blank");
+                    }}
+                  >
+                    WhatsApp
+                  </button>
 
-            <button onClick={() => (window.location.href = "tel:+256753670268")}>
-              <FiPhone size={18} />
-            </button>
-
-          </div>
+                  <button onClick={() => (window.location.href = "tel:+256753670268")}>
+                    <FiPhone size={18} />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Loading products...</p>
+          )}
         </div>
-      ))
-    ) : (
-      <p>Loading products...</p>
-    )}
-  </div>
-</section>
+      </section>
 
       {/* Testimonials Section */}
       <section className="testimonials">
@@ -152,6 +153,5 @@ const Home = () => {
     </div>
   );
 };
-
 
 export default Home;

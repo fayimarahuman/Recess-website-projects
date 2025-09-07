@@ -9,7 +9,9 @@ export const api = axios.create({
 // attach token if present
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("adminToken");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
   return config;
 });
 export const setAuthToken = (token) => {

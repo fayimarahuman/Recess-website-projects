@@ -6,7 +6,10 @@ const ProductCard = ({ product }) => {
   const phone = "256753670268"; // Seller's WhatsApp & call number
 
   const handleWhatsApp = () => {
-    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${product.image}`;
+    const domain = "https://carolineways.com"; // replace with your hosted domain
+    const imageUrl = `${domain}${product.image}`; // build full URL
+
+    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${imageUrl}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 

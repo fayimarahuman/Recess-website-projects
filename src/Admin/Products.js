@@ -50,61 +50,37 @@ const defaultImages = [chandelier1, chandelier2, chandelier3, chandelier4];
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
     id: null,
     name: "",
     description: "",
     image: "",
-    sales: 0,
-    stock: 0,
+    stock: "",
+    category_id: ""
   });
 
-  // Fetch products from backend
+  // Fetch products and categories
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
     try {
-      const res = await api.get("/products");
-      setProducts(res.data || []);
+      const res = await api.get("/product/get/all");
+      setProducts(res.data.products || []);
     } catch (err) {
       console.error("Error fetching products", err);
-      // Fallback to default images if backend fails
-      setProducts([
-        {
-          id: 1,
-          name: 'Modern Chandelier',
-          description: 'An elegant chandelier perfect for large living rooms.',
-          image: chandelier1,
-          sales: 34,
-          stock: 12
-        },
-        {
-          id: 2,
-          name: 'Minimalist Pendant Light',
-          description: 'A sleek hanging pendant light ideal for kitchens.',
-          image: chandelier2,
-          sales: 21,
-          stock: 8
-        },
-        {
-          id: 3,
-          name: 'Classic Wall Sconce',
-          description: 'A timeless wall sconce that adds warmth to any room.',
-          image: chandelier3,
-          sales: 15,
-          stock: 5
-        },
-        {
-          id: 4,
-          name: 'Elegant Crystal Chandelier',
-          description: 'A stunning crystal chandelier for a touch of luxury.',
-          image: chandelier4,
-          sales: 10,
-          stock: 2
-        }
-      ]);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get("/categories/all");
+      setCategories(res.data.categories || []);
+    } catch (err) {
+      console.error("Error fetching categories", err);
     }
   };
 
@@ -116,28 +92,39 @@ const AdminProducts = () => {
     e.preventDefault();
     try {
       if (form.id) {
-        await api.put(`/products/${form.id}`, form);
+        await api.put(`/product/update/${form.id}`, form);
       } else {
-        await api.post("/products", form);
+        await api.post("/product/create", form);
       }
-      setForm({ id: null, name: "", description: "", image: "", sales: 0, stock: 0 });
+      setForm({ id: null, name: "", description: "", image: "", stock: "", category_id: "" });
       fetchProducts();
+      alert("Product saved successfully!");
     } catch (err) {
       console.error("Error saving product", err);
+      alert("Failed to save product");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/products/${id}`);
+      await api.delete(`/product/delete/${id}`);
       fetchProducts();
+      alert("Product deleted successfully!");
     } catch (err) {
       console.error("Error deleting product", err);
+      alert("Failed to delete product");
     }
   };
 
   const handleEdit = (product) => {
-    setForm(product);
+    setForm({
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      image: product.image,
+      stock: product.stock,
+      category_id: product.category_id || ""
+    });
   };
 
   return (
@@ -146,37 +133,74 @@ const AdminProducts = () => {
 
       <form onSubmit={handleSubmit} style={{ marginBottom: '2rem', backgroundColor: '#fff', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
         <h3>{form.id ? 'Edit Product' : 'Add New Product'}</h3>
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" required style={inputStyle} />
-        <input name="description" value={form.description} onChange={handleChange} placeholder="Description" required style={inputStyle} />
-        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL" required style={inputStyle} />
-        <input name="sales" type="number" value={form.sales} onChange={handleChange} placeholder="Sales" style={inputStyle} />
-        <input name="stock" type="number" value={form.stock} onChange={handleChange} placeholder="Stock" style={inputStyle} />
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Product Name"
+          required
+          style={inputStyle}
+        />
+        <input
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          placeholder="Description"
+          required
+          style={inputStyle}
+        />
+        <input
+          name="image"
+          value={form.image}
+          onChange={handleChange}
+          placeholder="Image URL"
+          style={inputStyle}
+        />
+        <input
+          name="stock"
+          type="number"
+          value={form.stock}
+          onChange={handleChange}
+          placeholder="Stock"
+          style={inputStyle}
+        />
+
+        <select
+          name="category_id"
+          value={form.category_id}
+          onChange={handleChange}
+          required
+          style={{ ...inputStyle, appearance: "none", paddingRight: "2rem" }}
+        >
+          <option value="">Select Category</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
+          ))}
+        </select>
+
         <button type="submit" style={submitStyle}>{form.id ? 'Update Product' : 'Add Product'}</button>
       </form>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
         {products.map(product => (
           <div key={product.id} style={{ backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', transition: 'transform 0.2s ease-in-out' }}>
-            <img src={product.image || defaultImages[product.id % defaultImages.length]} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+            <img
+              src={product.image || defaultImages[product.id % defaultImages.length]}
+              alt={product.name}
+              style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+            />
             <div style={{ padding: '1.25rem' }}>
               <h3 style={{ marginBottom: '0.5rem', color: '#000' }}>{product.name}</h3>
               <p style={{ color: '#666', fontSize: '0.95rem' }}>{product.description}</p>
-              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.85rem', color: '#333' }}><strong>Sales:</strong> {product.sales}</span>
+              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.85rem', color: '#333' }}><strong>Stock:</strong> {product.stock}</span>
+                <span style={{ fontSize: '0.85rem', color: '#333' }}><strong>Price:</strong> {product.price}</span>
+                <span style={{ fontSize: '0.85rem', color: '#333' }}>
+                  <strong>Category:</strong> {categories.find(cat => cat.id === product.category_id)?.name || "N/A"}
+                </span>
               </div>
-              <button 
-                onClick={() => handleDelete(product.id)}
-                style={deleteStyle}
-              >
-                Delete
-              </button>
-              <button 
-                onClick={() => handleEdit(product)}
-                style={editStyle}
-              >
-                Edit
-              </button>
+              <button onClick={() => handleDelete(product.id)} style={deleteStyle}>Delete</button>
+              <button onClick={() => handleEdit(product)} style={editStyle}>Edit</button>
             </div>
           </div>
         ))}

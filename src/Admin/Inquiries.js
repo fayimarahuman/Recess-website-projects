@@ -1,48 +1,72 @@
-import React, { useState } from 'react';
-
-const initialInquiries = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    message: 'Do you offer installation services?',
-    status: 'Open'
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    message: 'Can I customize the chandelier length?',
-    status: 'Open'
-  }
-];
+import React, { useState, useEffect } from 'react';
+import { api } from '../api/client';
 
 const Inquiries = () => {
-  const [inquiries, setInquiries] = useState(initialInquiries);
+  const [inquiries, setInquiries] = useState([]);
 
-  const handleClose = (id) => {
-    const updated = inquiries.map((inq) =>
-      inq.id === id ? { ...inq, status: 'Closed' } : inq
-    );
-    setInquiries(updated);
+  useEffect(() => {
+    fetchInquiries();
+  }, []);
+
+  const fetchInquiries = async () => {
+    try {
+      const res = await api.get("/inquiry/all");
+      setInquiries(res.data.inquiries || []);
+    } catch (err) {
+      // fallback to demo data if backend fails
+      setInquiries([
+        {
+          id: 1,
+          name: 'John Doe',
+          email: 'john@example.com',
+          message: 'Do you offer installation services?',
+          status: 'Open'
+        },
+        {
+          id: 2,
+          name: 'Jane Smith',
+          email: 'jane@example.com',
+          message: 'Can I customize the chandelier length?',
+          status: 'Open'
+        }
+      ]);
+    }
   };
 
-  const handleDelete = (id) => {
-    setInquiries(inquiries.filter((inq) => inq.id !== id));
+  const handleClose = async (id) => {
+    try {
+      await api.put(`/inquiries/${id}`, { status: "Closed" });
+      fetchInquiries();
+    } catch (err) {
+      // fallback for demo
+      setInquiries(inquiries.map((inq) =>
+        inq.id === id ? { ...inq, status: 'Closed' } : inq
+      ));
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/inquiries/${id}`);
+      fetchInquiries();
+    } catch (err) {
+      // fallback for demo
+      setInquiries(inquiries.filter((inq) => inq.id !== id));
+    }
   };
 
   return (
     <div style={{ padding: '2rem', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
       <h2 style={{ color: '#ff7f00', marginBottom: '1.5rem' }}>📬 Customer Inquiries</h2>
       <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
+        <table style={{ width: '100%', minWidth: '600px', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
           <thead>
             <tr>
-              <th style={headerStyle}>Name</th>
-              <th style={headerStyle}>Email</th>
-              <th style={headerStyle}>Message</th>
-              <th style={headerStyle}>Status</th>
-              <th style={headerStyle}>Actions</th>
+              <th style={{ ...headerStyle, width: '15%' }}>Name</th>
+              <th style={{ ...headerStyle, width: '20%' }}>Email</th>
+              <th style={{ ...headerStyle, width: '35%' }}>Message</th>
+              <th style={{ ...headerStyle, width: '10%' }}></th>
+              <th style={{ ...headerStyle, width: '20%' }}>Actions</th>
             </tr>
           </thead>
           <tbody>

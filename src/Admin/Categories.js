@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { api } from "../api/client";
-import Chandeliers from '../assets/c3.jpg';
-import WallLights from '../assets/wl4.jpg';
-import PendantLight from '../assets/pl1.jpg';
 
 const inputStyle = {
   display: 'block',
@@ -45,57 +42,24 @@ const deleteStyle = {
   cursor: 'pointer'
 };
 
-const defaultCategories = [
-  {
-    id: 1,
-    name: 'Chandeliers',
-    scent: 'Elegant Glow',
-    image: Chandeliers,
-    sold: 45,
-    remaining: 10
-  },
-  {
-    id: 2,
-    name: 'Pendant Lights',
-    scent: 'Warm Ambience',
-    image: PendantLight,
-    sold: 38,
-    remaining: 15
-  },
-  {
-    id: 3,
-    name: 'Wall Lights',
-    scent: 'Soft Radiance',
-    image: WallLights,
-    sold: 22,
-    remaining: 8
-  },
-  {
-    id: 4,
-    name: 'Outdoor Lights',
-    scent: 'Cool Twilight',
-    image: 'https://images.unsplash.com/photo-1601121140273-bc69efc14f1d?auto=format&fit=crop&w=600&q=60',
-    sold: 30,
-    remaining: 20
-  }
-];
-
 const Categories = () => {
   const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState({ id: null, name: '', scent: '', image: '', sold: 0, remaining: 0 });
+  const [form, setForm] = useState({ id: null, name: '', description: '', image: '', sold: 0, remaining: 0 });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-  // Fetch categories from backend
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
     try {
-      const res = await api.get("/categories");
-      setCategories(res.data.categories || []);
+      const res = await api.get("/categories/all");
+      setCategories(res.data.categories || res.data || []); // handles both API response formats
+      setError("");
     } catch (err) {
-      // fallback to default if backend fails
-      setCategories(defaultCategories);
+      setCategories([]);
+      setError("Error fetching categories");
       console.error("Error fetching categories", err);
     }
   };
@@ -103,27 +67,45 @@ const Categories = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+    setError("");
+    setSuccess("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!form.name || !form.description || !form.image) {
+      setError("Please fill all required fields.");
+      return;
+    }
+
     try {
       if (form.id) {
-        await api.put(`/categories/${form.id}`, form);
+        await api.put(`/categories/update/${form.id}`, form);
+        setSuccess("Category updated successfully!");
       } else {
-        await api.post("/categories", form);
+        await api.post("/categories/create", form);
+        setSuccess("Category added successfully!");
       }
-      setForm({ id: null, name: '', scent: '', image: '', sold: 0, remaining: 0 });
+      setForm({ id: null, name: '', description: '', image: '', sold: 0, remaining: 0 });
       fetchCategories();
     } catch (err) {
-      console.error("Error saving category", err);
+      console.error("Error adding/updating category", err);
+      if (err.response?.data?.error?.includes("Duplicate entry")) {
+        setError("Category name already exists. Please use a unique name.");
+      } else if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Error adding category");
+      }
     }
   };
 
   const handleDelete = async (id) => {
-    console.log("Deleting category with id:", id); 
     try {
-      await api.delete(`/categories/${id}`);
+      await api.delete(`/categories/delete/${id}`);
       fetchCategories();
     } catch (err) {
       console.error("Error deleting category", err);
@@ -131,7 +113,14 @@ const Categories = () => {
   };
 
   const handleEdit = (category) => {
-    setForm(category);
+    setForm({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      image: category.image,
+      sold: category.sold,
+      remaining: category.remaining
+    });
   };
 
   return (
@@ -141,11 +130,13 @@ const Categories = () => {
       <form onSubmit={handleSubmit} style={{ backgroundColor: '#fff', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
         <h3>{form.id ? 'Edit Category' : 'Add New Category'}</h3>
         <input name="name" value={form.name} onChange={handleChange} placeholder="Category Name" required style={inputStyle} />
-        <input name="scent" value={form.scent} onChange={handleChange} placeholder="Scent Description" required style={inputStyle} />
+        <input name="description" value={form.description} onChange={handleChange} placeholder="Description" required style={inputStyle} />
         <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL" required style={inputStyle} />
         <input name="sold" type="number" value={form.sold} onChange={handleChange} placeholder="Sold Units" style={inputStyle} />
         <input name="remaining" type="number" value={form.remaining} onChange={handleChange} placeholder="Stock Remaining" style={inputStyle} />
         <button type="submit" style={submitStyle}>{form.id ? 'Update Category' : 'Add Category'}</button>
+        {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
+        {success && <p style={{ color: "green", marginTop: "1rem" }}>{success}</p>}
       </form>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
@@ -153,7 +144,7 @@ const Categories = () => {
           <div key={category.id} style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', textAlign: 'center' }}>
             <img src={category.image} alt={category.name} style={{ width: '100%', height: '180px', borderRadius: '10px', objectFit: 'cover', marginBottom: '1rem' }} />
             <h4 style={{ color: '#000' }}>{category.name}</h4>
-            <p style={{ color: '#777', fontSize: '0.9rem' }}>{category.scent}</p>
+            <p style={{ color: '#777', fontSize: '0.9rem' }}>{category.description}</p>
             <p style={{ color: '#555', fontSize: '0.85rem' }}><strong>Sold:</strong> {category.sold}</p>
             <p style={{ color: '#555', fontSize: '0.85rem' }}><strong>Remaining:</strong> {category.remaining}</p>
             <button onClick={() => handleEdit(category)} style={editStyle}>Edit</button>
@@ -166,6 +157,3 @@ const Categories = () => {
 };
 
 export default Categories;
-
-
-
