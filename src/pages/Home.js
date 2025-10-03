@@ -1,0 +1,157 @@
+import React, { useEffect, useState } from "react";
+import "../styles/Home.css";
+import { FiPhone } from "react-icons/fi";
+
+import chandeliers from '../assets/c1.jpg';
+import PendantLights from '../assets/pendant and ceiling14.jpg';
+import WallLamps from '../assets/wall lamp1.jpg';
+import LedLight from '../assets/lighting bulb10.jpg';
+import FloorLamp from '../assets/floor lamp23.jpg';
+import Scents from '../assets/scents.jpg';
+import TableLamp from '../assets/table lamp2.jpg';
+import Spares from '../assets/parts and spares6.jpg';
+import { useNavigate } from "react-router-dom";
+
+const heroImages = [
+  "/images/hero/hero1.jpg",
+  "/images/hero/hero2.jpg",
+  "/images/hero/hero3.jpg",
+];
+
+const testimonials = [
+  {
+    text: "I’ve been shopping from CAROLINE WAYS LTD for over a year now. Their product quality is unmatched.",
+    author: "— Sarah N., Interior Designer",
+  },
+  {
+    text: "As a contractor, I rely on trusted suppliers and CAROLINE WAYS LTD never disappoints.",
+    author: "— James K., Electrical Technician",
+  },
+];
+
+const Home = () => {
+  const [currentImage, setCurrentImage] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("/data/products.json")
+      .then((res) => res.json())
+      .then((data) => setProducts(data))
+      .catch((err) => console.error("Failed to load products:", err));
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % heroImages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleCategoryClick = (category) => {
+    navigate(`/products?category=${encodeURIComponent(category)}`);
+  };
+
+  return (
+    <div className="home">
+      {/* Hero Section */}
+      <div
+        className="hero"
+        style={{ backgroundImage: `url(${heroImages[currentImage]})` }}
+      >
+        <div className="overlay">
+          <h1>QUALITY YOU CAN RELY ON</h1>
+          <p>
+            Supplying trusted electrical light products for homes, businesses, and contractors.
+          </p>
+          <button className="cta-btn" onClick={() => navigate("/products")}>
+            VIEW PRODUCTS
+          </button>
+        </div>
+      </div>
+
+      {/* Categories Section */}
+      <section className="categories">
+        <h2>Our Product Categories</h2>
+        <div className="category-grid">
+          {[
+            { name: "Chandeliers", img: chandeliers },
+            { name: "Pendant & Ceiling", img: PendantLights },
+            { name: "Wall Lamps", img: WallLamps },
+            { name: "LED Light", img: LedLight },
+            { name: "Floor Lamps", img: FloorLamp },
+            { name: "Fragrance Diffusers", img: Scents },
+            { name: "Table Lamps", img: TableLamp },
+            { name: "Parts & Spares", img: Spares },
+          ].map((cat, index) => (
+            <div
+              className="category-card"
+              key={index}
+              onClick={() => handleCategoryClick(cat.name)}
+            >
+              <img src={cat.img} alt={cat.name} />
+              <div className="category-overlay">
+                <h4>{cat.name}</h4>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Featured Products Section */}
+      <section className="featured">
+        <h2>Featured Products</h2>
+        <div className="product-grid">
+          {products.length > 0 ? (
+            products.slice(0, 6).map((product) => (
+              <div className="product-card" key={product.id}>
+                <img src={product.image} alt={product.name} />
+                <h3>{product.name}</h3>
+
+                <div className="product-actions">
+                  <button
+                    onClick={() => {
+                      const domain = "https://carolineways.com"; // your hosted domain
+                      const imageUrl = `${domain}${product.image}`;
+                      const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${imageUrl}`;
+                      window.open(`https://wa.me/256753670268?text=${encodeURIComponent(message)}`, "_blank");
+                    }}
+                  >
+                    WhatsApp
+                  </button>
+
+                  <button onClick={() => (window.location.href = "tel:+256753670268")}>
+                    <FiPhone size={18} />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p>Loading products...</p>
+          )}
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="testimonials">
+        <h2>Testimonials</h2>
+        <div className="testimonial-list">
+          <blockquote key={currentTestimonial}>
+            {testimonials[currentTestimonial].text}
+            <footer>{testimonials[currentTestimonial].author}</footer>
+          </blockquote>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;

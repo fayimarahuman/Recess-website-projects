@@ -1,4 +1,5 @@
 from flask import Flask
+<<<<<<< HEAD
 from flask_cors import CORS
 from app.extensions import db, migrate, jwt, bcrypt
 from app.controllers.auth_controller import auth
@@ -9,6 +10,16 @@ from app.controllers.product_controller import product
 from app.controllers.inquiry_controller import inquiry
 from app.controllers.testimonial_controller import testimonial
 
+=======
+from app.extensions import db, migrate, jwt, bcrypt
+from app.controllers.auth_controller import auth
+from app.controllers.admin_controller import admin
+from app.controllers.category_controller import category
+from app.controllers.product_controller import product
+from app.controllers.testimonial_controller import testimonial
+
+# Application factory
+>>>>>>> a75de8d00c4277a7e072961b74cfc444bfec5b17
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
@@ -19,6 +30,7 @@ def create_app():
     jwt.init_app(app)
     bcrypt.init_app(app)
 
+<<<<<<< HEAD
     # Setup CORS to allow requests from React frontend
     CORS(app, resources={r"/auth/*": {"origins": ["http://localhost:3000"]}}, supports_credentials=True)
     CORS(app, resources={r"/api/*": {"origins": ["http://localhost:3000"]}}, supports_credentials=True)
@@ -29,11 +41,18 @@ def create_app():
     from app.models.category import Category
     from app.models.product import Product
     from app.models.inquiry import Inquiry
+=======
+    # Import models so Flask-Migrate knows about them
+    from app.models.admin import Admin
+    from app.models.category import Category
+    from app.models.product import Product
+>>>>>>> a75de8d00c4277a7e072961b74cfc444bfec5b17
     from app.models.testimonial import Testimonial
 
     # Register blueprints
     app.register_blueprint(auth)
     app.register_blueprint(admin)
+<<<<<<< HEAD
     app.register_blueprint(customer)
     app.register_blueprint(category)
     app.register_blueprint(product)
@@ -41,8 +60,19 @@ def create_app():
     app.register_blueprint(testimonial)
 
     # Simple index route
+=======
+    app.register_blueprint(category)
+    app.register_blueprint(product)
+    app.register_blueprint(testimonial)
+
+    # Index route
+>>>>>>> a75de8d00c4277a7e072961b74cfc444bfec5b17
     @app.route('/')
     def index():
         return "Welcome to CAROLINE WAYS LTD backend design"
 
+<<<<<<< HEAD
     return app
+=======
+    return app  # only return the app instance
+>>>>>>> a75de8d00c4277a7e072961b74cfc444bfec5b17
