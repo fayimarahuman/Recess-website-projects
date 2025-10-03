@@ -1,163 +1,109 @@
-import React, {useEffect, useState } from 'react';
-import {api} from "../api/client";
-import chandelier2 from '../assets/IMG-20250725-WA0052.jpg';
-import chandelier3 from '../assets/IMG-20250725-WA0053.jpg';
-import chandelier1 from '../assets/IMG-20250725-WA0054.jpg';
-import chandelier4 from '../assets/IMG-20250725-WA0055.jpg';
+import React, { useState, useEffect } from 'react';
+import { api, setAuthToken } from '../api/client'; // Your API client
 
-const initialProducts = [
-  {
-    id: 1,
-    name: 'Modern Chandelier',
-    description: 'An elegant chandelier perfect for large living rooms.',
-    image: chandelier1,
-    sales: 34,
-    stock: 12
-  },
-  {
-    id: 2,
-    name: 'Minimalist Pendant Light',
-    description: 'A sleek hanging pendant light ideal for kitchens.',
-    image: chandelier2,
-    sales: 21,
-    stock: 8
-  },
-  {
-    id: 3,
-    name: 'Classic Wall Sconce',
-    description: 'A timeless wall sconce that adds warmth to any room.',
-    image: chandelier3,
-    sales: 15,
-    stock: 5
-  },
-  {
-    id: 4,
-    name: 'Elegant Crystal Chandelier',
-    description: 'A stunning crystal chandelier for a touch of luxury.',
-    image: chandelier4,
-    sales: 10,
-    stock: 2
-  }
-];
+const Products = () => {
+  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState({ name: '', description: '', category: 'Lighting' });
 
+  const categories = ['Lighting', 'Decor', 'Furniture'];
 
-const inputStyle = {
-  display: 'block',
-  width: '100%',
-  marginBottom: '0.75rem',
-  padding: '0.6rem',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  fontSize: '0.95rem'
-};
-
-const submitStyle = {
-  padding: '0.6rem 1rem',
-  backgroundColor: '#FF7F00',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '6px',
-  cursor: 'pointer',
-  fontWeight: 'bold'
-};
-
-const deleteStyle = {
-  marginTop: '1rem',
-  marginRight: '0.5rem',
-  backgroundColor: '#d9534f',
-  color: '#fff',
-  border: 'none',
-  padding: '0.5rem 1rem',
-  borderRadius: '6px',
-  cursor: 'pointer'
-};
-
-const editStyle = {
-  marginTop: '1rem',
-  backgroundColor: '#000',
-  color: '#fff',
-  border: 'none',
-  padding: '0.5rem 1rem',
-  borderRadius: '6px',
-  cursor: 'pointer'
-};
-
-const AdminProducts = () => {
-  const [products, setProducts] = useState(initialProducts);
-  const [form, setForm] = useState({ id: null, name: '', description: '', image: '', sales: 0, stock: 0 });
-
+  // ---------------------- FETCH PRODUCTS ----------------------
   useEffect(() => {
-    api.get("/products")
-      .then((res) => setProducts(res.data))
-      .catch((err) => console.error(err));
+    const fetchProducts = async () => {
+      try {
+        const token = localStorage.getItem('token'); // get token from localStorage
+        if (token) setAuthToken(token); // set token in headers
+
+        const res = await api.get('/product/get/all'); // consuming GET /product/get/all
+        setProducts(res.data.products); // update state with API response
+      } catch (err) {
+        console.error('Error fetching products:', err.response?.data || err.message);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
-  const handleDelete = (id) => {
-    setProducts(products.filter(product => product.id !== id));
-  };
-
-  const handleEdit = (product) => {
-    setForm(product);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (form.id) {
-      setProducts(products.map(p => (p.id === form.id ? form : p)));
-    } else {
-      setProducts([...products, { ...form, id: Date.now() }]);
+  // ---------------------- ADD PRODUCT ----------------------
+  const addProduct = async () => {
+    if (!form.name) return;
+    try {
+      const res = await api.post('/product/create', form); // consuming POST /product/create
+      setProducts([...products, { id: res.data.product_id, ...form }]); // add new product to state
+      setForm({ name: '', description: '', category: 'Lighting' });
+    } catch (err) {
+      console.error('Error adding product:', err.response?.data || err.message);
     }
-    setForm({ id: null, name: '', description: '', image: '', sales: 0, stock: 0 });
+  };
+
+  // ---------------------- DELETE PRODUCT ----------------------
+  const deleteProduct = async (id) => {
+    try {
+      await api.delete(`/product/delete/${id}`); // consuming DELETE /product/delete/:id
+      setProducts(products.filter(p => p.id !== id)); // remove deleted product from state
+    } catch (err) {
+      console.error('Error deleting product:', err.response?.data || err.message);
+    }
+  };
+
+  // ---------------------- UPDATE PRODUCT ----------------------
+  const updateProduct = async (product) => {
+    const name = prompt('Product Name:', product.name);
+    const description = prompt('Description:', product.description);
+    const category = prompt('Category:', product.category);
+    if (!name || !description || !category) return;
+
+    try {
+      await api.put(`/product/update/${product.id}`, { name, description, category }); // consuming PUT /product/update/:id
+      setProducts(products.map(p => p.id === product.id ? { ...p, name, description, category } : p));
+    } catch (err) {
+      console.error('Error updating product:', err.response?.data || err.message);
+    }
   };
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#f4f4f4', minHeight: '100vh' }}>
-      <h2 style={{ color: '#FF7F00', marginBottom: '2rem' }}>💡 Product Listings</h2>
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#FF7F00' }}>Products</h2>
+      <input type="text" placeholder="Product Name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={input} />
+      <input type="text" placeholder="Description" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} style={input} />
+      <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} style={input}>
+        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+      </select>
+      <button onClick={addProduct} style={addBtn}>Add</button>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '2rem', backgroundColor: '#fff', padding: '1rem', borderRadius: '12px', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
-        <h3>{form.id ? 'Edit Product' : 'Add New Product'}</h3>
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Product Name" required style={inputStyle} />
-        <input name="description" value={form.description} onChange={handleChange} placeholder="Description" required style={inputStyle} />
-        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL" required style={inputStyle} />
-        <input name="sales" type="number" value={form.sales} onChange={handleChange} placeholder="Sales" style={inputStyle} />
-        <input name="stock" type="number" value={form.stock} onChange={handleChange} placeholder="Stock" style={inputStyle} />
-        <button type="submit" style={submitStyle}>{form.id ? 'Update Product' : 'Add Product'}</button>
-      </form>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-        {products.map(product => (
-          <div key={product.id} style={{ backgroundColor: '#fff', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)', transition: 'transform 0.2s ease-in-out' }}>
-            <img src={product.image} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
-            <div style={{ padding: '1.25rem' }}>
-              <h3 style={{ marginBottom: '0.5rem', color: '#000' }}>{product.name}</h3>
-              <p style={{ color: '#666', fontSize: '0.95rem' }}>{product.description}</p>
-              <div style={{ marginTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '0.85rem', color: '#333' }}><strong>Sales:</strong> {product.sales}</span>
-                <span style={{ fontSize: '0.85rem', color: '#333' }}><strong>Stock:</strong> {product.stock}</span>
-              </div>
-              <button 
-                onClick={() => handleDelete(product.id)}
-                style={deleteStyle}
-              >
-                Delete
-              </button>
-              <button 
-                onClick={() => handleEdit(product)}
-                style={editStyle}
-              >
-                Edit
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thTd}>#</th>
+            <th style={thTd}>Name</th>
+            <th style={thTd}>Description</th>
+            <th style={thTd}>Category</th>
+            <th style={thTd}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p, idx) => (
+            <tr key={p.id}>
+              <td style={thTd}>{idx + 1}</td>
+              <td style={thTd}>{p.name}</td>
+              <td style={thTd}>{p.description}</td>
+              <td style={thTd}>{p.category}</td>
+              <td style={thTd}>
+                <button onClick={() => updateProduct(p)} style={actionBtn}>Edit</button>
+                <button onClick={() => deleteProduct(p.id)} style={actionBtn}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default AdminProducts;
+const input = { padding: '0.5rem', marginRight: '0.5rem', marginTop: '0.5rem' };
+const addBtn = { padding: '0.5rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none', marginTop: '0.5rem' };
+const thTd = { border: '1px solid #ddd', padding: '0.5rem', textAlign: 'left' };
+const actionBtn = { marginRight: '0.5rem', padding: '0.3rem 0.6rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' };
+const tableStyle = { width: '100%', marginTop: '1rem', borderCollapse: 'collapse' };
+
+export default Products;

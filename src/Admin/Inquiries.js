@@ -1,101 +1,91 @@
-import React, { useState } from 'react';
-
-const initialInquiries = [
-  {
-    id: 1,
-    name: 'John Doe',
-    email: 'john@example.com',
-    message: 'Do you offer installation services?',
-    status: 'Open'
-  },
-  {
-    id: 2,
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    message: 'Can I customize the chandelier length?',
-    status: 'Open'
-  }
-];
+import React, { useState, useEffect } from 'react';
+import { api, setAuthToken } from '../api/client';
 
 const Inquiries = () => {
-  const [inquiries, setInquiries] = useState(initialInquiries);
+  const [inquiries, setInquiries] = useState([]);
+  const [newInquiry, setNewInquiry] = useState('');
 
-  const handleClose = (id) => {
-    const updated = inquiries.map((inq) =>
-      inq.id === id ? { ...inq, status: 'Closed' } : inq
-    );
-    setInquiries(updated);
+  useEffect(() => {
+    const fetchInquiries = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) setAuthToken(token);
+
+        const res = await api.get('/inquiry/get/all'); // consuming GET /inquiry/get/all
+        setInquiries(res.data.inquiries);
+      } catch (err) {
+        console.error(err.response?.data || err.message);
+      }
+    };
+
+    fetchInquiries();
+  }, []);
+
+  const addInquiry = async () => {
+    if (!newInquiry) return;
+    try {
+      const res = await api.post('/inquiry/create', { message: newInquiry }); // POST
+      setInquiries([...inquiries, { id: res.data.inquiry_id, message: newInquiry }]);
+      setNewInquiry('');
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
   };
 
-  const handleDelete = (id) => {
-    setInquiries(inquiries.filter((inq) => inq.id !== id));
+  const updateInquiry = async (id, message) => {
+    const updatedMessage = prompt('Update inquiry:', message);
+    if (!updatedMessage) return;
+    try {
+      await api.put(`/inquiry/update/${id}`, { message: updatedMessage }); // PUT
+      setInquiries(inquiries.map(i => i.id === id ? { ...i, message: updatedMessage } : i));
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
+  };
+
+  const deleteInquiry = async (id) => {
+    try {
+      await api.delete(`/inquiry/delete/${id}`); // DELETE
+      setInquiries(inquiries.filter(i => i.id !== id));
+    } catch (err) {
+      console.error(err.response?.data || err.message);
+    }
   };
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#f5f5f5', minHeight: '100vh' }}>
-      <h2 style={{ color: '#ff7f00', marginBottom: '1.5rem' }}>📬 Customer Inquiries</h2>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'separate', borderSpacing: '0 0.75rem' }}>
-          <thead>
-            <tr>
-              <th style={headerStyle}>Name</th>
-              <th style={headerStyle}>Email</th>
-              <th style={headerStyle}>Message</th>
-              <th style={headerStyle}>Status</th>
-              <th style={headerStyle}>Actions</th>
+    <div style={{ padding: '2rem' }}>
+      <h2 style={{ color: '#FF7F00' }}>Customer Inquiries</h2>
+      <input type="text" placeholder="Enter inquiry message" value={newInquiry} onChange={e => setNewInquiry(e.target.value)} style={{ padding: '0.5rem', marginRight: '0.5rem', width: '50%' }} />
+      <button onClick={addInquiry} style={addBtn}>Add</button>
+
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thTd}>#</th>
+            <th style={thTd}>Message</th>
+            <th style={thTd}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {inquiries.map((i, idx) => (
+            <tr key={i.id}>
+              <td style={thTd}>{idx + 1}</td>
+              <td style={thTd}>{i.message}</td>
+              <td style={thTd}>
+                <button onClick={() => updateInquiry(i.id, i.message)} style={actionBtn}>Edit</button>
+                <button onClick={() => deleteInquiry(i.id)} style={actionBtn}>Delete</button>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {inquiries.map((inq) => (
-              <tr key={inq.id} style={rowStyle}>
-                <td style={cellStyle}>{inq.name}</td>
-                <td style={cellStyle}>{inq.email}</td>
-                <td style={cellStyle}>{inq.message}</td>
-                <td style={{ ...cellStyle, fontWeight: 'bold', color: inq.status === 'Open' ? '#28a745' : '#888' }}>{inq.status}</td>
-                <td style={cellStyle}>
-                  {inq.status === 'Open' && (
-                    <button onClick={() => handleClose(inq.id)} style={buttonStyle('#ff7f00')}>Close</button>
-                  )}
-                  <button onClick={() => handleDelete(inq.id)} style={buttonStyle('#d9534f')}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-const headerStyle = {
-  textAlign: 'left',
-  padding: '1rem',
-  backgroundColor: '#000',
-  color: '#fff',
-  borderTopLeftRadius: '6px',
-  borderTopRightRadius: '6px'
-};
-
-const rowStyle = {
-  backgroundColor: '#fff',
-  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.05)'
-};
-
-const cellStyle = {
-  padding: '1rem',
-  borderBottom: '1px solid #eee'
-};
-
-const buttonStyle = (bgColor) => ({
-  backgroundColor: bgColor,
-  color: '#fff',
-  border: 'none',
-  padding: '0.5rem 0.75rem',
-  borderRadius: '4px',
-  marginRight: '0.5rem',
-  cursor: 'pointer'
-});
+const addBtn = { padding: '0.5rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none' };
+const thTd = { border: '1px solid #ddd', padding: '0.5rem', textAlign: 'left' };
+const actionBtn = { marginRight: '0.5rem', padding: '0.3rem 0.6rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' };
+const tableStyle = { width: '100%', marginTop: '1rem', borderCollapse: 'collapse' };
 
 export default Inquiries;
-
-

@@ -1,68 +1,84 @@
+// Sidebar.jsx
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import {
-  FiHome,
-  FiPackage,
-  FiUsers,
-  FiGrid,
-  FiMail,
-  FiMessageSquare,
-} from 'react-icons/fi';
-import logo from '../assets/logo.png'; 
 
 const Sidebar = () => {
   const menuItems = [
-    { path: '/admin', label: 'Dashboard', icon: <FiHome /> },
-    { path: '/admin/products', label: 'Products', icon: <FiPackage /> },
-    { path: '/admin/customers', label: 'Customers', icon: <FiUsers /> },
-    { path: '/admin/categories', label: 'Categories', icon: <FiGrid /> },
-    { path: '/admin/inquiries', label: 'Inquiries', icon: <FiMail /> },
-    { path: '/admin/testimonials', label: 'Testimonials', icon: <FiMessageSquare /> },
+    { name: 'Dashboard', path: '/admin/dashboard' },
+    { name: 'Products', path: '/admin/products' },
+    { name: 'Categories', path: '/admin/categories' },
+    { name: 'Inquiries', path: '/admin/inquiries' },
+    { name: 'Testimonials', path: '/admin/testimonials' },
+    { name: 'Profile', path: '/admin/profile' },
   ];
 
   return (
-    <div style={{
-      width: '300px',
-      backgroundColor: '#c6c1b6ff',
-      color: '#fac124ff',
-      minHeight: '50vh',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '4rem 4rem',
-    }}>
-      <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
+    <div style={sidebar}>
+      <div style={profile}>
         <img
-          src={logo}
-          alt="Caroline Ways"
-          style={{ width: '120px', borderRadius: '6px' }}
+          src="https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=200&q=80"
+          alt="Admin"
+          style={avatar}
         />
-        <h2 style={{ color: '#ff7f00', fontSize: '1.2rem', marginTop: '0.5rem' }}>Caroline Ways Admin Panel</h2>
+        <h3 style={{ color: '#fff', marginTop: '0.5rem' }}>Caroline M.</h3>
       </div>
 
-      <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        {menuItems.map(({ path, label, icon }) => (
+      <nav style={nav}>
+        {menuItems.map((item, idx) => (
           <NavLink
-            to={path}
-            key={label}
+            key={idx}
+            to={item.path}
             style={({ isActive }) => ({
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.75rem',
-              padding: '0.75rem',
-              color: isActive ? '#ff7f00' : 'white',
-              backgroundColor: isActive ? '#333' : 'transparent',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: 500,
+              ...linkStyle,
+              backgroundColor: isActive ? '#FF7F00' : 'transparent',
             })}
           >
-            {icon}
-            {label}
+            {item.name}
           </NavLink>
         ))}
       </nav>
     </div>
   );
+};
+
+const sidebar = {
+  width: '220px',
+  minHeight: '100vh',
+  backgroundColor: '#FF7F00',
+  padding: '1rem',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  position: 'fixed',
+};
+
+const profile = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  marginBottom: '2rem',
+};
+
+const avatar = {
+  width: '80px',
+  height: '80px',
+  borderRadius: '50%',
+  border: '3px solid #fff',
+};
+
+const nav = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+};
+
+const linkStyle = {
+  padding: '0.8rem 1rem',
+  marginBottom: '0.5rem',
+  color: '#fff',
+  textDecoration: 'none',
+  borderRadius: '6px',
+  fontWeight: 'bold',
 };
 
 export default Sidebar;

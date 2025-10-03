@@ -1,7 +1,27 @@
-import React from 'react';
-import '../styles/Contact.css';
+import React, { useState } from "react";
+import { api } from "../api/client";
+import "../styles/Contact.css";
 
 const Contact = () => {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState("");
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post("/inquiry/create", form); // Send message to backend
+      setStatus("Message sent successfully!");
+      setForm({ name: "", email: "", message: "" }); // Reset form
+    } catch (err) {
+      console.error("Error sending message", err);
+      setStatus("Failed to send message. Please try again.");
+    }
+  };
+
   return (
     <div className="contact-container">
       <h2>Contact Us</h2>
@@ -27,12 +47,33 @@ const Contact = () => {
         </div>
       </div>
 
-      <form className="contact-form">
+      <form className="contact-form" onSubmit={handleSubmit}>
         <h3>Send Us a Message</h3>
-        <input type="text" placeholder="Your Name" required />
-        <input type="email" placeholder="Your Email" required />
-        <textarea rows="5" placeholder="Your Message" required></textarea>
+        <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          placeholder="Your Name"
+          required
+        />
+        <input
+          name="email"
+          type="email"
+          value={form.email}
+          onChange={handleChange}
+          placeholder="Your Email"
+          required
+        />
+        <textarea
+          name="message"
+          rows="5"
+          value={form.message}
+          onChange={handleChange}
+          placeholder="Your Message"
+          required
+        ></textarea>
         <button type="submit">Send Message</button>
+        {status && <p className="contact-status">{status}</p>}
       </form>
     </div>
   );

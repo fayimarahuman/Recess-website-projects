@@ -1,39 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import "../styles/Products.css";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
   useEffect(() => {
-    fetch("/data/products.json")
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error("Failed to fetch products:", err));
+    fetchAllProducts();
   }, []);
 
-  const handleAddToCart = (product) => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
-    if (!isLoggedIn) {
-      navigate("/register");
-      return;
-    }
+  const fetchAllProducts = async () => {
+    try {
+      // 1️⃣ Fetch static JSON products
+      const jsonRes = await fetch("/data/products.json");
+      const jsonData = await jsonRes.json();
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const exists = cart.find((item) => item.id === product.id);
+      // 2️⃣ Fetch products from API (admin added)
+      const apiRes = await fetch("http://localhost:5000/product/get/all");
+      const apiData = await apiRes.json();
 
-    if (!exists) {
-      cart.push({ ...product, quantity: 1 });
-      localStorage.setItem("cart", JSON.stringify(cart));
-      alert("Item added to cart!");
-    } else {
-      alert("Item already in cart.");
+      // 3️⃣ Merge them
+      const allProducts = [
+        ...(jsonData || []),
+        ...(apiData.products || [])
+      ];
+
+      setProducts(allProducts);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      // fallback: only JSON products
+      const fallbackRes = await fetch("/data/products.json");
+      const fallbackData = await fallbackRes.json();
+      setProducts(fallbackData || []);
     }
   };
 
@@ -72,7 +74,6 @@ const Products = () => {
             <ProductCard
               key={product.id}
               product={product}
-              onAddToCart={handleAddToCart}
             />
           ))
         ) : (

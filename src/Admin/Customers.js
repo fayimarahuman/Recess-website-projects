@@ -1,117 +1,114 @@
-import React, { useState } from 'react';
-
-const initialCustomers = [
-  {
-    id: 1,
-    name: 'Alice Johnson',
-    email: 'alice@example.com',
-    location: 'Kampala',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg'
-  },
-  {
-    id: 2,
-    name: 'Brian Kamya',
-    email: 'brian@example.com',
-    location: 'Entebbe',
-    image: 'https://randomuser.me/api/portraits/men/35.jpg'
-  }
-];
+// src/pages/Customers.jsx
+import React, { useState, useEffect } from 'react';
+import { api, setAuthToken } from '../api/client'; // your axios instance
 
 const Customers = () => {
-  const [customers, setCustomers] = useState(initialCustomers);
-  const [form, setForm] = useState({ id: null, name: '', email: '', location: '', image: '' });
+  const [customers, setCustomers] = useState([]);
+  const [newCustomer, setNewCustomer] = useState('');
+  const [error, setError] = useState('');
 
-  const handleDelete = (id) => {
-    setCustomers(customers.filter(customer => customer.id !== id));
-  };
+  // ---------------------- FETCH CUSTOMERS FROM BACKEND ----------------------
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) setAuthToken(token); // set token in axios headers
 
-  const handleEdit = (customer) => {
-    setForm(customer);
-  };
+        const res = await api.get('/customer/get/all'); 
+        // consuming GET /customer/get/all
+        setCustomers(res.data.customers);
+      } catch (err) {
+        console.error('Error fetching customers:', err.response?.data || err.message);
+      }
+    };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
-  };
+    fetchCustomers();
+  }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (form.id) {
-      setCustomers(customers.map(c => (c.id === form.id ? form : c)));
-    } else {
-      setCustomers([...customers, { ...form, id: Date.now() }]);
+  // ---------------------- ADD CUSTOMER ----------------------
+  const addCustomer = async () => {
+    if (!newCustomer) return;
+    setError('');
+
+    try {
+      const res = await api.post('/customer/create', { name: newCustomer });
+      // consuming POST /customer/create
+      setCustomers([...customers, { id: res.data.customer_id, name: newCustomer }]);
+      setNewCustomer('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error adding customer');
     }
-    setForm({ id: null, name: '', email: '', location: '', image: '' });
+  };
+
+  // ---------------------- DELETE CUSTOMER ----------------------
+  const deleteCustomer = async (id) => {
+    try {
+      await api.delete(`/customer/delete/${id}`); 
+      // consuming DELETE /customer/delete/:id
+      setCustomers(customers.filter(c => c.id !== id));
+    } catch (err) {
+      console.error('Error deleting customer:', err.response?.data || err.message);
+    }
+  };
+
+  // ---------------------- UPDATE CUSTOMER ----------------------
+  const updateCustomer = async (id, name) => {
+    try {
+      const updatedName = prompt('Update customer name:', name);
+      if (!updatedName) return;
+
+      await api.put(`/customer/update/${id}`, { name: updatedName });
+      // consuming PUT /customer/update/:id
+
+      setCustomers(customers.map(c => c.id === id ? { ...c, name: updatedName } : c));
+    } catch (err) {
+      console.error('Error updating customer:', err.response?.data || err.message);
+    }
   };
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#f9f9f9', minHeight: '100vh' }}>
-      <h2 style={{ color: '#FF7F00' }}>👤 Customer Management</h2>
+    <div>
+      <h2 style={{ color: '#FF7F00' }}>Customers</h2>
 
-      <form onSubmit={handleSubmit} style={{ background: '#fff', padding: '1rem', borderRadius: '12px', marginBottom: '2rem', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
-        <h3>{form.id ? 'Edit Customer' : 'Add New Customer'}</h3>
-        <input name="name" value={form.name} onChange={handleChange} placeholder="Name" required style={inputStyle} />
-        <input name="email" value={form.email} onChange={handleChange} placeholder="Email" required style={inputStyle} />
-        <input name="location" value={form.location} onChange={handleChange} placeholder="Location" required style={inputStyle} />
-        <input name="image" value={form.image} onChange={handleChange} placeholder="Image URL" required style={inputStyle} />
-        <button type="submit" style={submitStyle}>{form.id ? 'Update Customer' : 'Add Customer'}</button>
-      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-        {customers.map(customer => (
-          <div key={customer.id} style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '1rem', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', textAlign: 'center' }}>
-            <img src={customer.image} alt={customer.name} style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', marginBottom: '1rem' }} />
-            <h4 style={{ color: '#000' }}>{customer.name}</h4>
-            <p style={{ color: '#555', margin: '0.25rem 0' }}>{customer.email}</p>
-            <p style={{ color: '#777' }}>{customer.location}</p>
-            <button onClick={() => handleEdit(customer)} style={editStyle}>Edit</button>
-            <button onClick={() => handleDelete(customer.id)} style={deleteStyle}>Delete</button>
-          </div>
-        ))}
-      </div>
+      <input
+        type="text"
+        placeholder="Enter customer name"
+        value={newCustomer}
+        onChange={(e) => setNewCustomer(e.target.value)}
+        style={{ padding: '0.5rem', marginRight: '0.5rem' }}
+      />
+      <button onClick={addCustomer} style={addBtn}>Add</button>
+
+      <table style={tableStyle}>
+        <thead>
+          <tr>
+            <th style={thTd}>#</th>
+            <th style={thTd}>Customer Name</th>
+            <th style={thTd}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {customers.map((c, idx) => (
+            <tr key={c.id}>
+              <td style={thTd}>{idx + 1}</td>
+              <td style={thTd}>{c.name}</td>
+              <td style={thTd}>
+                <button onClick={() => updateCustomer(c.id, c.name)} style={actionBtn}>Edit</button>
+                <button onClick={() => deleteCustomer(c.id)} style={actionBtn}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-const inputStyle = {
-  display: 'block',
-  width: '100%',
-  marginBottom: '0.75rem',
-  padding: '0.6rem',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
-  fontSize: '0.95rem'
-};
-
-const submitStyle = {
-  padding: '0.6rem 1rem',
-  backgroundColor: '#FF7F00',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '6px',
-  cursor: 'pointer',
-  fontWeight: 'bold'
-};
-
-const editStyle = {
-  marginTop: '1rem',
-  marginRight: '0.5rem',
-  backgroundColor: '#000',
-  color: '#fff',
-  border: 'none',
-  padding: '0.5rem 1rem',
-  borderRadius: '6px',
-  cursor: 'pointer'
-};
-
-const deleteStyle = {
-  marginTop: '1rem',
-  backgroundColor: '#d9534f',
-  color: '#fff',
-  border: 'none',
-  padding: '0.5rem 1rem',
-  borderRadius: '6px',
-  cursor: 'pointer'
-};
+const addBtn = { padding: '0.5rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none' };
+const thTd = { border: '1px solid #ddd', padding: '0.5rem', textAlign: 'left' };
+const actionBtn = { marginRight: '0.5rem', padding: '0.3rem 0.6rem', backgroundColor: '#FF7F00', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' };
+const tableStyle = { width: '100%', marginTop: '1rem', borderCollapse: 'collapse' };
 
 export default Customers;

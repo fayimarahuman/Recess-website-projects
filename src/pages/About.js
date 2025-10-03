@@ -3,7 +3,9 @@ import '../styles/About.css';
 import Diffusers from '../assets/diffusers.jpg';
 import Bulb from '../assets/lighting bulb10.jpg';
 import FloorLamp from '../assets/floor lamp23.jpg';
-import about from '../assets/c5.jpg';
+import about from '../assets/ceiling.jpg';
+import { FaBullseye, FaBookOpen, FaEye, FaLightbulb} from "react-icons/fa";
+
 
 const About = () => {
   return (
@@ -41,37 +43,40 @@ const About = () => {
           <p style={gridText}>Transform your space with our premium fragrance diffusers.</p>
         </div>
       </section>
+        <section className="about-content">
+          <div className="section-block story-bg">
+            <h2><FaBookOpen className="header-icon" /> Our Story</h2>
+            <p> Founded with a vision to bridge the gap between quality electrical supplies and affordability, Caroline Ways Ltd has grown steadily to become a trusted supplier known for exceptional customer service and product reliability. Our journey started from a small shop at Energy Center, Kampala, and today we serve a diverse clientele ranging from individual homeowners to large-scale commercial clients. </p> <p> At the core of our operations lies a dedication to sourcing the best products from reputable manufacturers and offering a wide range of lighting accessories, electrical parts, and fragrance diffusers — all tailored to meet the unique needs of our customers. </p>
+
+          </div>
+
+          <div className="mission-vision-grid">
+            <div className="about-box">
+              <h2><FaBullseye className="header-icon" />Our Mission</h2>
+              <p>
+                To supply reliable and affordable electrical products that enhance the safety, comfort, and efficiency of homes and businesses, while fostering lasting relationships with our customers and partners through trust and excellence.
+              </p>
+            </div>
+
+            <div className="about-box">
+              <h2><FaEye className="header-icon" />Our Vision</h2>
+              <p>
+                To be the foremost provider of innovative and sustainable electrical solutions in Uganda, recognized for exceptional quality, customer satisfaction, and community impact.
+              </p>
+            </div>
+          </div>
 
 
-      <section className="about-content">
-        <h2>Our Story</h2>
-        <p>
-          Founded with a vision to bridge the gap between quality electrical supplies and affordability, Caroline Ways Ltd has grown steadily 
-          to become a trusted supplier known for exceptional customer service and product reliability. Our journey started from a small shop 
-          at Energy Center, Kampala, and today we serve a diverse clientele ranging from individual homeowners to large-scale commercial clients.
-        </p>
-        <p>
-          At the core of our operations lies a dedication to sourcing the best products from reputable manufacturers and offering a wide range 
-          of lighting accessories, electrical parts, and fragrance diffusers — all tailored to meet the unique needs of our customers.
-        </p>
-
-        <h2>Our Vision</h2>
-        <p>
-          To be the foremost provider of innovative and sustainable electrical solutions in Uganda, recognized for exceptional quality, customer satisfaction, and community impact.
-        </p>
-
-        <h2>Our Mission</h2>
-        <p>
-          To supply reliable and affordable electrical products that enhance the safety, comfort, and efficiency of homes and businesses, while fostering lasting relationships with our customers and partners through trust and excellence.
-        </p>
-
-        <h2>What We Offer</h2>
-        <ul>
-          <li>High-quality LED lights and lamps that blend functionality with aesthetics</li>
-          <li>Durable parts and spares to keep your electrical installations running smoothly</li>
-          <li>Innovative fragrance diffusers to enhance your living and working spaces</li>
-          <li>Exceptional customer support that guides you through every purchase</li>
-        </ul>
+          <div className="section-block offer-bg">
+            <h2><FaLightbulb className="header-icon" /> What We Offer</h2>
+            <ul>
+              <li>High-quality LED lights and lamps that blend functionality with aesthetics</li>
+              <li>Durable parts and spares to keep your electrical installations running smoothly</li>
+              <li>Innovative fragrance diffusers to enhance your living and working spaces</li>
+              <li>Exceptional customer support that guides you through every purchase</li>
+            </ul>
+          </div>
+        </section>
 
         <h2>Our Team</h2>
         <div className="team-grid">
@@ -96,7 +101,7 @@ const About = () => {
             <p>Product Specialist</p>
           </div>
         </div>
-      </section>
+
     </div>
   );
 };

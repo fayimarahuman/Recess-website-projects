@@ -1,11 +1,15 @@
 import React from "react";
+import { FiPhone } from "react-icons/fi"; // phone call icon
 import "../styles/ProductCard.css";
 
 const ProductCard = ({ product }) => {
   const phone = "256753670268"; // Seller's WhatsApp & call number
 
   const handleWhatsApp = () => {
-    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${product.image}`;
+    const domain = "https://carolineways.com"; // replace with your hosted domain
+    const imageUrl = `${domain}${product.image}`; // build full URL
+
+    const message = `Hello, I'm interested in ${product.name}.\nCheck this image: ${imageUrl}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, "_blank");
   };
 
@@ -25,7 +29,7 @@ const ProductCard = ({ product }) => {
           WhatsApp
         </button>
         <button className="btn contact-btn" onClick={handleCall}>
-          Call
+          <FiPhone size={18} /> {/* Phone icon */}
         </button>
       </div>
     </div>
